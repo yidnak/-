@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>井字棋游戏</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .game-container {
+            text-align: center;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin: 20px auto;
+            background-color: #fff;
+            padding: 5px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .cell {
+            width: 80px;
+            height: 80px;
+            background-color: #f8f8f8;
+            border: 2px solid #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .cell:hover {
+            background-color: #f0f0f0;
+        }
+
+        .cell.x {
+            color: #ff4757;
+        }
+
+        .cell.o {
+            color: #2ed573;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-top: 10px;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #status {
+            font-size: 24px;
+            margin: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>井字棋游戏</h1>
+        <div id="status">当前玩家：X</div>
+        <div class="board" id="board">
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+            <div class="cell" data-cell></div>
+        </div>
+        <button onclick="resetGame()">重新开始</button>
+    </div>
+
+    <script>
+        let currentPlayer = 'X';
+        const cells = document.querySelectorAll('[data-cell]');
+        const status = document.getElementById('status');
+        
+        // 给所有格子添加点击事件
+        cells.forEach(cell => {
+            cell.addEventListener('click', handleClick, { once: true });
+        });
+
+        // 点击事件处理函数
+        function handleClick(e) {
+            const cell = e.target;
+            
+            if (cell.textContent !== '') return; // 已经有内容的格子不能被点击
+            
+            // 更新当前玩家状态
+            cell.textContent = currentPlayer;
+            cell.classList.add(currentPlayer.toLowerCase());
+            
+            // 检查胜利条件
+            if (checkWin()) {
+                status.textContent = `玩家 ${currentPlayer} 获胜！`;
+                return;
+            }
+            
+            // 切换到下一个玩家
+            currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+            updateStatus();
+        }
+
+        // 检查胜利条件
+        function checkWin() {
+            const winningCombinations = [
+                [0, 1, 2], [3, 4, 5], [6, 7, 8],
+                [0, 3, 6], [1, 4, 7], [2, 5, 8],
+                [0, 4, 8], [2, 4, 6]
+            ];
+
+            return winningCombinations.some(combination => {
+                const [a, b, c] = combination;
+                return (
+                    cells[a].textContent === currentPlayer &&
+                    cells[b].textContent === currentPlayer &&
+                    cells[c].textContent === currentPlayer
+                );
+            });
+        }
+
+        // 更新当前玩家状态
+        function updateStatus() {
+            status.textContent = `当前玩家：${currentPlayer}`;
+        }
+
+        // 重置游戏
+        function resetGame() {
+            cells.forEach(cell => {
+                cell.textContent = '';
+                cell.classList.remove('x', 'o');
+                cell.addEventListener('click', handleClick, { once: true });
+            });
+            currentPlayer = 'X';
+            updateStatus();
+        }
+    </script>
+</body>
+</html>
